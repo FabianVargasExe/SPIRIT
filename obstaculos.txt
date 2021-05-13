@@ -1,0 +1,6 @@
+X,X,S,X,X,X,X,S
+X,E,NO,X,E,O,X,N
+E,O,X,S,SE,EO,O,S
+E,SO,S,N,NE,EO,OS,N
+S,NS,N,X,X,X,N,X
+N,N,X,X,X,X,X,X
