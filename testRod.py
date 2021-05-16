@@ -22,6 +22,7 @@ class Node:
         self.i = i   
         self.j = j
         self.meta = meta
+        self.valido = False
         if self.meta[0] != self.i or self.meta[1] != self.j:
             self.norte = self.crearHijo("N")
             self.sur = self.crearHijo("S")
@@ -30,25 +31,26 @@ class Node:
         else:
             global c
             c+=1
+            self.valido = True
             print("Meta encontrada")
             print(self.posAnteriores)
     def crearHijo(self, dir):
-        if dir == "N" and self.j>0 and "N" not in obs[self.i][self.j] and [self.i-1, self.j] not in self.posAnteriores and self.orientacion != "S":
+        if dir == "N" and self.i>0 and "N" not in obs[self.i][self.j] and [self.i-1, self.j] not in self.posAnteriores and self.orientacion != "S":
             self.new_posAnteriores = self.posAnteriores.copy()
             self.new_posAnteriores.append([self.i, self.j])
-            self.norte = Node(self.i, self.j - 1,self.meta,self.new_posAnteriores, "N", self.calcularTiempo("N"))
-        elif dir == "S" and self.j<5 and "S" not in obs[self.i][self.j] and [self.i+1, self.j] not in self.posAnteriores and self.orientacion != "N": 
+            self.norte = Node(self.i - 1, self.j,self.meta,self.new_posAnteriores, "N", self.calcularTiempo("N"))
+        elif dir == "S" and self.i<5 and "S" not in obs[self.i][self.j] and [self.i+1, self.j] not in self.posAnteriores and self.orientacion != "N": 
             self.new_posAnteriores = self.posAnteriores.copy()
             self.new_posAnteriores.append([self.i, self.j])
-            self.sur = Node(self.i, self.j + 1,self.meta,self.new_posAnteriores, "S", self.calcularTiempo("S"))
-        elif dir == "E" and self.i<7 and "E" not in obs[self.i][self.j] and [self.i, self.j+1] not in self.posAnteriores and self.orientacion != "O": 
+            self.sur = Node(self.i+1, self.j,self.meta,self.new_posAnteriores, "S", self.calcularTiempo("S"))
+        elif dir == "E" and self.j<7 and "E" not in obs[self.i][self.j] and [self.i, self.j+1] not in self.posAnteriores and self.orientacion != "O": 
             self.new_posAnteriores = self.posAnteriores.copy()
             self.new_posAnteriores.append([self.i, self.j])
-            self.este = Node(self.i+1, self.j,self.meta,self.new_posAnteriores, "E", self.calcularTiempo("E"))
-        elif dir == "O" and self.i>0 and "O" not in obs[self.i][self.j] and [self.i, self.j-1] not in self.posAnteriores and self.orientacion != "E": 
+            self.este = Node(self.i, self.j+1,self.meta,self.new_posAnteriores, "E", self.calcularTiempo("E"))
+        elif dir == "O" and self.j>0 and "O" not in obs[self.i][self.j] and [self.i, self.j-1] not in self.posAnteriores and self.orientacion != "E": 
             self.new_posAnteriores = self.posAnteriores.copy()
             self.new_posAnteriores.append([self.i, self.j])
-            self.oeste = Node(self.i-1, self.j,self.meta,self.new_posAnteriores, "O", self.calcularTiempo("O"))
+            self.oeste = Node(self.i, self.j-1,self.meta,self.new_posAnteriores, "O", self.calcularTiempo("O"))
             
     def PrintTree(self):
         print(self.data)
@@ -60,19 +62,21 @@ class Node:
         if dir != self.orientacion:
             temp+=4
         if dir == "N" or dir == "S":
-            tempi = self.i
-            if dir == "N":
-                tempj = self.j - 1
-            else:
-                tempj = self.j +1
-        if dir == "E" or dir == "O":
             tempj = self.j
-            if dir == "E":
-                tempi = self.i + 1
-            else:
-                tempi = self.i -1    
-        print("Inicio en",self.i,self.j,"; movimiento direccion",dir,"; pos final",tempi, tempj)
+            if dir == "N":
 
+                tempi = self.i - 1
+            else:
+
+                tempi = self.i +1
+        if dir == "E" or dir == "O":
+            tempi = self.i
+            if dir == "E":
+
+                tempj = self.j + 1
+            else:
+
+                tempj = self.j -1    
         if mapa[tempi][tempj] == "1":
             temp+=1/1.2
         elif mapa[tempi][tempj] == "2":
