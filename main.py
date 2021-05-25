@@ -16,6 +16,10 @@ class Node:
         self.orientacion = orientacion
         self.i = i   
         self.j = j
+        self.hijoN = None
+        self.hijoS = None
+        self.hijoE = None
+        self.hijoO = None
         self.valido = False
         if mapaPrueba.meta[0] == self.i and mapaPrueba.meta[1] == self.j:
             self.valido = True
@@ -44,22 +48,39 @@ class Node:
         if dir == "N" and self.i>0 and "N" not in mapaPrueba.obs[self.i][self.j] and [self.i-1, self.j] not in self.posAnteriores:
             self.new_posAnteriores = self.posAnteriores.copy()
             self.new_posAnteriores.append([self.i, self.j])
-            return Node(self.i - 1, self.j,self.new_posAnteriores, "N", self.calcularTiempo("N"))
+            self.hijoN = Node(self.i - 1, self.j,self.new_posAnteriores, "N", self.calcularTiempo("N"))
+            return
         elif dir == "S" and self.i<mapaPrueba.n -1 and "S" not in mapaPrueba.obs[self.i][self.j] and [self.i+1, self.j] not in self.posAnteriores: 
             self.new_posAnteriores = self.posAnteriores.copy()
             self.new_posAnteriores.append([self.i, self.j])
-            return Node(self.i+1, self.j,self.new_posAnteriores, "S", self.calcularTiempo("S"))
+            self.hijoS = Node(self.i+1, self.j,self.new_posAnteriores, "S", self.calcularTiempo("S"))
+            return
         elif dir == "E" and self.j<mapaPrueba.m-1 and "E" not in mapaPrueba.obs[self.i][self.j] and [self.i, self.j+1] not in self.posAnteriores: 
             self.new_posAnteriores = self.posAnteriores.copy()
             self.new_posAnteriores.append([self.i, self.j])
-            return Node(self.i, self.j+1,self.new_posAnteriores, "E", self.calcularTiempo("E"))
+            self.hijoE = Node(self.i, self.j+1,self.new_posAnteriores, "E", self.calcularTiempo("E"))
+            return
         elif dir == "O" and self.j>0 and "O" not in mapaPrueba.obs[self.i][self.j] and [self.i, self.j-1] not in self.posAnteriores: 
             self.new_posAnteriores = self.posAnteriores.copy()
             self.new_posAnteriores.append([self.i, self.j])
-            return Node(self.i, self.j-1,self.new_posAnteriores, "O", self.calcularTiempo("O"))
-            
+            self.hijoO = Node(self.i, self.j-1,self.new_posAnteriores, "O", self.calcularTiempo("O"))
+            return
+        return     
 
-
+    def obtenerHijo(self, dir):
+        '''
+        Funcion para obtener el hijo segun la direccion solicitada
+        '''
+        if dir == "N":
+            return self.hijoN
+        elif dir == "S":
+            return self.hijoS
+        elif dir == "E":
+            return self.hijoE
+        elif dir == "O":
+            return self.hijoO
+        else:
+            return None
     def calcularTiempo(self, dir):
         '''
         Funcion para calcular el tiempo que se demora cada movimiento                 
@@ -112,6 +133,11 @@ class Node:
             
 
 class claseMapa:
+    '''
+    Clase mapa, que obtiene el tamaño del mapa en N x M, el mapa y sus obstaculos,
+    junto a la posicion de la meta.
+    
+    '''
     def __init__(self, n, m):
         self.n = n
         self.m = m
@@ -123,6 +149,10 @@ class claseMapa:
         self.meta = []
         
     def generarMapa(self):
+    '''
+    Funcion para generar el mapa al azar en base a N y M. Valores del mapa,
+    obstaculos y meta se genera al azar.
+    '''
         for i in range(self.n):
             for j in range(self.m):
                 self.mapa[i][j] = random.choice([1,2])
@@ -146,7 +176,13 @@ class claseMapa:
                             self.obs[i][j-1].append("E")
         self.meta.append(random.randrange(1,self.n))
         self.meta.append(random.randrange(1,self.m))
+        
     def leerMapa(self, nomMapa):
+        '''
+        Funcion para poder leer un mapa a traves de un archivo de texto. 
+        Utilizado netamente para probar el algoritmo en un comienzo, podria
+        ser util mantenerlo
+        '''
         self.archMapa = open(nomMapa, "r")
         for i in range(self.n):
             self.linea = self.archMapa.readline().strip()
@@ -157,6 +193,11 @@ class claseMapa:
         self.archMapa.close()
         
     def leerObstaculos(self, nomObs):
+        '''
+        Funcion para poder leer los obstaculos a traves de un archivo de texto. 
+        Utilizado netamente para probar el algoritmo en un comienzo, podria
+        ser util mantenerlo
+        '''
         self.archObs = open(nomObs,"r")
         for i in range(self.n):
             self.linea = self.archObs.readline().strip()
@@ -165,16 +206,28 @@ class claseMapa:
                 self.obs[i][j] = list(self.partes[j])
     
 def getCamino(nodo):
+    '''
+    Funcion para poder obtener el camino desde el nodo final (meta) hasta la
+    raiz. Se imprime por pantalla las direcciones desde el origen hasta la meta
+    '''
+    
     camino = ""
     while nodo is not None:
         if nodo.padre is not None:
             camino= nodo.orientacion + camino
         nodo = nodo.padre
     print("Las direcciones del mejor camino son:",camino)
-#Leemos el mapa y los obstaculos
-#Estas son guardadas en dos matrices 
+
 
 def breadthFirst(nodo):
+    '''
+    Funcion para poder llegar a la meta a traves de Breadth First. 
+    Utilizamos una cola para ir guardando los nodos que serán  recorridos,
+    segun el orden del algoritmo. A esta cola solamente se agregarán aquellos
+    hijos que existen (no habrán nodos nulos). Se termina una vez se encuentra
+    la meta, o la cola se queda vacia por que no existe un camino a la meta.
+    
+    '''
     cola = []
     tiempo = 99999999999999999999999
     camino = []
@@ -187,10 +240,14 @@ def breadthFirst(nodo):
             meta = cola.pop(0)
             break
         else:
-            hijoN = cola[0].crearHijo("N")
-            hijoS = cola[0].crearHijo("S")
-            hijoE = cola[0].crearHijo("E")
-            hijoO = cola[0].crearHijo("O")
+            cola[0].crearHijo("N")
+            cola[0].crearHijo("S")
+            cola[0].crearHijo("E")
+            cola[0].crearHijo("O")
+            hijoN = cola[0].obtenerHijo("N")
+            hijoS = cola[0].obtenerHijo("S")
+            hijoE = cola[0].obtenerHijo("E")
+            hijoO = cola[0].obtenerHijo("O")
             if hijoN is not None:
                 hijoN.setPadre(cola[0])
                 cola.append(hijoN)
@@ -212,6 +269,14 @@ def breadthFirst(nodo):
     
     
 def bestTime(nodo):
+    '''
+    Funcion para buscar el camino más rapido a la meta. 
+    Utilizamos una cola para ir guardando los nodos que serán  recorridos,
+    segun el orden del algoritmo. A esta cola solamente se agregarán aquellos
+    hijos que existen (no habrán nodos nulos). Se termina una vez se recorran
+    todos los caminos posibles, y muestra por pantalla el mejor nodo.
+    
+    '''
     cola = []
     tiempo = 99999999999999999999999
     camino = []
@@ -226,10 +291,14 @@ def bestTime(nodo):
             else:
                 del cola[0]
         else:
-            hijoN = cola[0].crearHijo("N")
-            hijoS = cola[0].crearHijo("S")
-            hijoE = cola[0].crearHijo("E")
-            hijoO = cola[0].crearHijo("O")
+            cola[0].crearHijo("N")
+            cola[0].crearHijo("S")
+            cola[0].crearHijo("E")
+            cola[0].crearHijo("O")
+            hijoN = cola[0].obtenerHijo("N")
+            hijoS = cola[0].obtenerHijo("S")
+            hijoE = cola[0].obtenerHijo("E")
+            hijoO = cola[0].obtenerHijo("O")
             if hijoN is not None:
                 hijoN.setPadre(cola[0])
                 cola.append(hijoN)
