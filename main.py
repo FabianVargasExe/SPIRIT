@@ -21,7 +21,7 @@ class Node:
         self.hijoE = None
         self.hijoO = None
         self.valido = False
-        if mapaPrueba.meta[0] == self.i and mapaPrueba.meta[1] == self.j:
+        if mapaPrueba.getMeta()[0] == self.i and mapaPrueba.getMeta()[1] == self.j:
             self.valido = True
             self.posAnteriores.append([i,j])
   
@@ -45,22 +45,22 @@ class Node:
         
         '''
         global mapaPrueba
-        if dir == "N" and self.i>0 and "N" not in mapaPrueba.obs[self.i][self.j] and [self.i-1, self.j] not in self.posAnteriores:
+        if dir == "N" and self.i>0 and "N" not in mapaPrueba.getObs()[self.i][self.j] and [self.i-1, self.j] not in self.posAnteriores:
             self.new_posAnteriores = self.posAnteriores.copy()
             self.new_posAnteriores.append([self.i, self.j])
             self.hijoN = Node(self.i - 1, self.j,self.new_posAnteriores, "N", self.calcularTiempo("N"))
             return
-        elif dir == "S" and self.i<mapaPrueba.n -1 and "S" not in mapaPrueba.obs[self.i][self.j] and [self.i+1, self.j] not in self.posAnteriores: 
+        elif dir == "S" and self.i<mapaPrueba.getN() -1 and "S" not in mapaPrueba.getObs()[self.i][self.j] and [self.i+1, self.j] not in self.posAnteriores: 
             self.new_posAnteriores = self.posAnteriores.copy()
             self.new_posAnteriores.append([self.i, self.j])
             self.hijoS = Node(self.i+1, self.j,self.new_posAnteriores, "S", self.calcularTiempo("S"))
             return
-        elif dir == "E" and self.j<mapaPrueba.m-1 and "E" not in mapaPrueba.obs[self.i][self.j] and [self.i, self.j+1] not in self.posAnteriores: 
+        elif dir == "E" and self.j<mapaPrueba.getM()-1 and "E" not in mapaPrueba.getObs()[self.i][self.j] and [self.i, self.j+1] not in self.posAnteriores: 
             self.new_posAnteriores = self.posAnteriores.copy()
             self.new_posAnteriores.append([self.i, self.j])
             self.hijoE = Node(self.i, self.j+1,self.new_posAnteriores, "E", self.calcularTiempo("E"))
             return
-        elif dir == "O" and self.j>0 and "O" not in mapaPrueba.obs[self.i][self.j] and [self.i, self.j-1] not in self.posAnteriores: 
+        elif dir == "O" and self.j>0 and "O" not in mapaPrueba.getObs()[self.i][self.j] and [self.i, self.j-1] not in self.posAnteriores: 
             self.new_posAnteriores = self.posAnteriores.copy()
             self.new_posAnteriores.append([self.i, self.j])
             self.hijoO = Node(self.i, self.j-1,self.new_posAnteriores, "O", self.calcularTiempo("O"))
@@ -121,9 +121,9 @@ class Node:
 
                 self.tempj = self.j -1
         #Verificamos si el suelo es liso o no
-        if mapaPrueba.mapa[self.tempi][self.tempj] == 1:
+        if mapaPrueba.getMapa()[self.tempi][self.tempj] == 1:
             self.temp+= (1.0/1.2)
-        elif mapaPrueba.mapa[self.tempi][self.tempj] == 2:
+        elif mapaPrueba.getMapa()[self.tempi][self.tempj] == 2:
             self.temp+=(1.0/0.5)
         return self.temp
         
@@ -149,10 +149,10 @@ class claseMapa:
         self.meta = []
         
     def generarMapa(self):
-    '''
-    Funcion para generar el mapa al azar en base a N y M. Valores del mapa,
-    obstaculos y meta se genera al azar.
-    '''
+        '''       
+        Funcion para generar el mapa al azar en base a N y M. Valores del mapa,
+        obstaculos y meta se genera al azar.
+        '''
         for i in range(self.n):
             for j in range(self.m):
                 self.mapa[i][j] = random.choice([1,2])
@@ -204,6 +204,33 @@ class claseMapa:
             self.partes = self.linea.split(",")
             for j in range(self.m):
                 self.obs[i][j] = list(self.partes[j])
+    def getMapa(self):
+        '''
+        Funcion para poder obtener la matriz mapa del objeto
+        '''
+        return self.mapa
+    
+    def getObs(self):
+        '''
+        Funcion para poder obtener la matriz obstaculos del objeto
+        '''
+        return self.obs
+    def getMeta(self):
+        '''
+        Funcion para poder obtener la meta del objeto
+        '''
+        return self.meta
+    def getN(self):
+        '''
+        Funcion para poder obtener el N del objeto
+        '''
+        return self.n
+    def getM(self):
+        '''
+        Funcion para poder obtener el M del objeto
+        '''
+        return self.m
+
     
 def getCamino(nodo):
     '''
